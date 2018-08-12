@@ -36,3 +36,4 @@ Virtualenv is suggested, then:
 1. pip install -r requirements.txt
 2. cp .env.sample .env
 3. update the .env file with credentials you've got from your workspace in the IBM Cloud dashboard
+4. launch `./trial.py`
