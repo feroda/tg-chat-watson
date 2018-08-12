@@ -5,6 +5,8 @@ import os
 
 from watson_developer_cloud import AssistantV1
 
+DEBUG = os.environ.get('APP_DEBUG', 'False') not in ['False', 'None', '0', ''] 
+
 service = AssistantV1(
     version='2018-02-16',
     # url=os.environ.get('APP_URL'),
@@ -25,7 +27,9 @@ def process_msg(msg, context={}):
         input = { 'text': msg },
         context = context)
 
-    print(json.dumps(response, indent=2))
+    if DEBUG:
+        print(json.dumps(response, indent=2))
+
     # If an intent was detected, print it to the console.
     if response['intents']:
         print('Detected intent: #' + response['intents'][0]['intent'])
