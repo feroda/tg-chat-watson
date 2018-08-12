@@ -20,10 +20,15 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
-def start(bot, update):
+def start(bot, update, user_data):
     """Send a message when the command /start is issued."""
-    update.message.reply_text('Hi!')
+    response = AI.process_msg('iniziamo')
 
+    # Update the stored context with the latest received from the dialog.
+    user_data['context'] = response['context']
+
+    text = response['output']['text'][0]
+    update.message.reply_text(text)
 
 def help(bot, update):
     """Send a message when the command /help is issued."""
@@ -61,7 +66,7 @@ def main():
     dp = updater.dispatcher
 
     # on different commands - answer in Telegram
-    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("start", start, pass_user_data=True))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("reset", reset, pass_user_data=True))
 
