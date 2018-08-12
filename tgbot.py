@@ -9,7 +9,7 @@ import logging
 import os
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-import trial as AI
+import wassistant
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update, user_data):
     """Send a message when the command /start is issued."""
-    response = AI.process_msg('iniziamo')
+    response = wassistant.process_msg('iniziamo')
 
     # Update the stored context with the latest received from the dialog.
     user_data['context'] = response['context']
@@ -38,7 +38,7 @@ def help(bot, update):
 def AI_request(bot, update, user_data):
     """Echo the user message."""
 
-    response = AI.process_msg(update.message.text, user_data.get('context', {}))
+    response = wassistant.process_msg(update.message.text, user_data.get('context', {}))
 
     # Update the stored context with the latest received from the dialog.
     user_data['context'] = response['context']
