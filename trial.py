@@ -17,16 +17,15 @@ workspace_id = os.environ.get('APP_WORKSPACE_ID')
 user_input = ''
 context = {}
 
-# Main input/output loop
-while True:
+def process_msg(msg, context={}):
 
     # Send message to Assistant service.
     response = service.message(
         workspace_id = workspace_id,
-        input = { 'text': user_input },
+        input = { 'text': msg },
         context = context)
 
-    # print(json.dumps(response, indent=2))
+    print(json.dumps(response, indent=2))
     # If an intent was detected, print it to the console.
     if response['intents']:
         print('Detected intent: #' + response['intents'][0]['intent'])
@@ -35,9 +34,19 @@ while True:
     if response['output']['text']:
         print(response['output']['text'][0])
 
-    # Update the stored context with the latest received from the dialog.
-    context = response['context']
+    return response
 
-    # Prompt for next round of input.
-    user_input = input('>> ')
+
+# Main input/output loop
+if __name__ == "__main__":
+
+    while True:
+
+        response = process_msg(user_input, context)
+
+        # Update the stored context with the latest received from the dialog.
+        context = response['context']
+
+        # Prompt for next round of input.
+        user_input = input('>> ')
 
