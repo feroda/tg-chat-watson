@@ -7,9 +7,11 @@
 
 import logging
 import os
+import json
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import wassistant
+import wspeech2text
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -36,9 +38,22 @@ def help(bot, update):
 
 
 def AI_request(bot, update, user_data):
-    """Echo the user message."""
+    """Recognize if audio and ask Watson!"""
 
-    response = wassistant.process_msg(update.message.text, user_data.get('context', {}))
+    if update.message.voice:
+        # Quick and dirty
+        tg_file = update.message.voice.get_file()
+        tg_file.download()
+        with open(os.path.basename(tg_file.file_path), 'rb') as file:
+            response = wspeech2text.process_msg(file, content_type="audio/ogg")
+
+        print(json.dumps(response, indent=2))
+        text = response['results'][0]['alternatives'][0]['transcript']
+
+    else:
+        text = update.message.text
+
+    response = wassistant.process_msg(text, user_data.get('context', {}))
 
     # Update the stored context with the latest received from the dialog.
     user_data['context'] = response['context']
@@ -71,7 +86,7 @@ def main():
     dp.add_handler(CommandHandler("reset", reset, pass_user_data=True))
 
     # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler(Filters.text, AI_request, pass_user_data=True))
+    dp.add_handler(MessageHandler(Filters.text | Filters.voice, AI_request, pass_user_data=True))
 
     # log all errors
     dp.add_error_handler(error)
